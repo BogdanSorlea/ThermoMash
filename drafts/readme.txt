@@ -1,0 +1,1 @@
+In this folder add other subfolders, each containing a "draft project" (project which is used just for testing some part of the implementation - and use it for later reference).
