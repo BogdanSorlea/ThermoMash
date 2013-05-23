@@ -1,3 +1,0 @@
-This is the file containing the text you are reading.
-
-And this is the edited line I added.
