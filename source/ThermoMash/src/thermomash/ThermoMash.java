@@ -100,6 +100,8 @@ public class ThermoMash {
             if ( IS_ADMIN ){
                 System.out.println("ADM. Conn. nodes: " + ids.size());
                 
+                data.put(getIP(), (int) Math.round(20 + Math.random() * 10));
+                
                 if ( request != null ){
                 if ( request.equals(Settings.NETWORK_ATTACH_REQ) ){
                     System.out.println("NATTREQ");
@@ -133,6 +135,20 @@ public class ThermoMash {
                                     + Settings.FIELD_DELIMITER 
                                     + getIP() + Settings.FIELD_DELIMITER
                                     + Settings.ADMINOK);
+                        
+                } else if ( request.equals(Settings.QUERYDATA) ) {
+                        long sum = 0;
+                        int count = 0;
+                        for (String key : data.keySet()) {
+                            sum += data.get(key);
+                            count++;
+                        }
+                        if ( count > 0 )
+                            transmitBroadcast(Settings.DATARESPONSE + 
+                                    (int) sum / count);
+                        else
+                            transmitBroadcast(Settings.DATARESPONSE +
+                                    "NOT AVAILABLE");
                 } else {
 
                     if ( request.contains(Settings.MONITOROK) ) {
