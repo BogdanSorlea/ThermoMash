@@ -56,7 +56,7 @@ public class ThermoMash {
             transmitBroadcast(Settings.NETWORK_ATTACH_REQ);
             String response = null;
             response = receiveBroadcast(Settings.BROADCAST_RECEIVE_TIMEOUT);
-            
+            System.out.print("REsponse: " + response);
             // If there is already an admin and a monitor in the system.
             if ( response != null 
                     && response.contains(Settings.NETWORK_ATTACH_CONF)
@@ -257,7 +257,7 @@ public class ThermoMash {
                 lastResponseIP = packet.getSocketAddress().toString().trim();//socket.getRemoteSocketAddress().toString();
                 lastResponseIP = lastResponseIP.replace("/", "");
                 lastResponseIP = lastResponseIP.substring(0, lastResponseIP.indexOf(":"));
-                System.out.println("broadcast from: " + lastResponseIP);
+                //System.out.println("broadcast from: " + lastResponseIP);
             } catch (SocketTimeoutException e) {
                 data = null;
                 lastResponseIP = null;
