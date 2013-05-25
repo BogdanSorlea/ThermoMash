@@ -18,6 +18,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
@@ -67,6 +68,7 @@ public class JavaApplication2 {
                 //PrintStream os = new PrintStream(clientSocket.getOutputStream());
                 
                 response = is.readLine();
+                lastResponseIP = clientSocket.getRemoteSocketAddress().toString();
                 
                 //System.out.print("ATTACHLOOP: got the following TCP resp... " + response);
                 is.close();
@@ -127,6 +129,26 @@ public class JavaApplication2 {
             String request = null;
             request = receiveBroadcast(Settings.BROADCAST_FAST_RECEIVE_TIMEOUT);
             
+            String response = null;
+            try {
+                server.setSoTimeout(Settings.TCP_RECEIVE_TIMEOUT);
+                clientSocket = server.accept();
+                BufferedReader is = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                //PrintStream os = new PrintStream(clientSocket.getOutputStream());
+
+                response = is.readLine();
+                lastResponseIP = clientSocket.getRemoteSocketAddress().toString();
+
+                //System.out.print("ATTACHLOOP: got the following TCP resp... " + response);
+                is.close();
+                clientSocket.close();
+            } catch (SocketException ex) {
+                System.out.println("LOOP: Could not read TCP connection. Socket timeout?");
+            } catch (IOException ex) {
+                System.out.println("LOOP: Could not read TCP connection. IO Exception");
+            }
+            
+            
             if (IS_ADMIN) {
                 if (request != null){
                     if (request.equals(Settings.NETWORK_ATTACH_REQ)){
@@ -162,7 +184,15 @@ public class JavaApplication2 {
                         
                         
                         noOfNodes++;
-                    }                
+                    }
+                    
+                }
+                
+                if ( response != null ){
+                    if ( response.contains(Settings.DATAPREFIX) ){
+                        response = response.replace(Settings.DATAPREFIX, "");
+                        System.out.println("LOOP - ADMIN: just logged " + response + " from " + lastResponseIP);
+                    }
                 }
                 
 //                String received = null;
@@ -183,6 +213,23 @@ public class JavaApplication2 {
             if (IS_WORKER) {
                 if (request != null){
 
+                }
+                
+                clientSocket = null;
+                try {
+                    System.out.println("LOOP - WORKER: Sending data");
+                    clientSocket = new Socket(adminIP, Settings.TCP_PORT);
+                    BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+                    out.write(Long.toString(Math.round(Math.random() * 10) + 20));
+                    out.close();
+                    //clientSocket.close();
+                } catch (UnknownHostException ex) {
+                    //Logger.getLogger(JavaApplication2.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println("LOOP - ADMIN: IP/Host Unknown");
+                } catch (IOException ex) {
+                    //Logger.getLogger(JavaApplication2.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println("LOOP - ADMIN: I/O Exception... "
+                            + ex.getMessage());
                 }
                 
 //                try {

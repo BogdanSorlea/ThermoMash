@@ -20,6 +20,7 @@ public class Settings {
     static int BROADCAST_FAST_RECEIVE_TIMEOUT = 500;
     static String NETWORK_ATTACH_MONITOR = "NATTMONIT";
     static int TCP_RECEIVE_TIMEOUT = 1000;
+    static String DATAPREFIX = "DATA:";
     
     
     
