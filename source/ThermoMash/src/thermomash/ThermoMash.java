@@ -69,7 +69,7 @@ public class ThermoMash {
             } 
             // If there is already an admin in the system.
             else if ( response != null 
-                    && response.equals(Settings.NETWORK_ATTACH_MONITOR)
+                    && response.contains(Settings.NETWORK_ATTACH_MONITOR)
                     && response.contains(getIP()) ) {
                 IS_ADMIN = false;
                 IS_WORKER = true;
