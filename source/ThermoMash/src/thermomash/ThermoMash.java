@@ -98,13 +98,13 @@ public class ThermoMash {
                 if ( request != null ){
                 if ( request.equals(Settings.NETWORK_ATTACH_REQ) ){
                     System.out.println("NATTREQ");
-                    if ( noOfNodes / 2 == 1 ) {
+                    if ( noOfNodes == 2 ) {
                         transmitBroadcast(lastResponseIP
                                 + Settings.FIELD_DELIMITER
                                 + getIP() + Settings.FIELD_DELIMITER
                                 + Settings.NETWORK_ATTACH_MONITOR);
                         monitorIP = lastResponseIP;
-                    } else {
+                    } else if ( noOfNodes > 2) {
                         transmitBroadcast(lastResponseIP
                                 + Settings.FIELD_DELIMITER
                                 + getIP() + Settings.FIELD_DELIMITER
