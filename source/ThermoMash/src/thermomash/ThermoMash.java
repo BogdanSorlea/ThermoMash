@@ -80,7 +80,6 @@ public class ThermoMash {
             
             IS_ADMIN = true;
             IS_WORKER = false;
-            noOfNodes = 1;
             NETWORK_ATTACH_ATTEMPTS++;
             if ( NETWORK_ATTACH_ATTEMPTS == MAX_NETWORK_ATTACH_ATTEMPTS )
                 System.out.println("NO RESPONSE. UPGRADING TO ADMIN.");
@@ -94,12 +93,12 @@ public class ThermoMash {
             
             // writephase
             if ( IS_ADMIN ){
-                System.out.println("ADM. Conn. nodes: " + noOfNodes);
+                System.out.println("ADM. Conn. nodes: " + noOfNodes / 2);
                 
                 if ( request != null ){
                 if ( request.equals(Settings.NETWORK_ATTACH_REQ) ){
                     System.out.println("NATTREQ");
-                    if ( noOfNodes == 1 ) {
+                    if ( noOfNodes % 2 == 1 ) {
                         transmitBroadcast(lastResponseIP
                                 + Settings.FIELD_DELIMITER
                                 + getIP() + Settings.FIELD_DELIMITER
@@ -196,7 +195,7 @@ public class ThermoMash {
                                 + Settings.FIELD_DELIMITER
                                 + getIP() + Settings.FIELD_DELIMITER
                                 + Settings.DATAPREFIX + Long.toString(
-                            Math.round(17 + Math.random() * 10));
+                            Math.round(20 + Math.random() * 10));
                 System.out.println(dat);
                 transmitBroadcast(dat);
             }
