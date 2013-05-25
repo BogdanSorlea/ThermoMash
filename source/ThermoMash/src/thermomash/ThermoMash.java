@@ -112,9 +112,17 @@ public class ThermoMash {
                                 + Settings.FIELD_DELIMITER
                                 + getIP() + Settings.FIELD_DELIMITER
                                 + Settings.NETWORK_ATTACH_MONITOR);
+                        System.out.println(lastResponseIP
+                                + Settings.FIELD_DELIMITER
+                                + getIP() + Settings.FIELD_DELIMITER
+                                + Settings.NETWORK_ATTACH_MONITOR);
                         monitorIP = lastResponseIP;
                     } else {
                         transmitBroadcast(lastResponseIP
+                                + Settings.FIELD_DELIMITER
+                                + getIP() + Settings.FIELD_DELIMITER
+                                + Settings.NETWORK_ATTACH_CONF);
+                        System.out.println(lastResponseIP
                                 + Settings.FIELD_DELIMITER
                                 + getIP() + Settings.FIELD_DELIMITER
                                 + Settings.NETWORK_ATTACH_CONF);
