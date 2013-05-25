@@ -65,14 +65,17 @@ public class JavaApplication2 {
                 clientSocket = server.accept();
                 BufferedReader is = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 //PrintStream os = new PrintStream(clientSocket.getOutputStream());
+                
                 response = is.readLine();
+                
+                //System.out.print("ATTACHLOOP: got the following TCP resp... " + response);
                 is.close();
                 clientSocket.close();
             } catch (IOException ex) {
                 //Logger.getLogger(JavaApplication2.class.getName()).log(Level.SEVERE, null, ex);
                 System.out.println("ATTACHLOOP: IOException - probably socket timeout");
             }
-            
+            System.out.println("!!! " + response);
             if ( response != null
                     && response.contains(Settings.NETWORK_ATTACH_CONFIRM) ) {
                 System.out.println("ATTACHLOOP: Simple attach confirmed.");
@@ -137,15 +140,23 @@ public class JavaApplication2 {
                         
                         clientSocket = null;
                         try {
+                            System.out.println("LOOP - ADMIN: Trying to send NETWATT confirm. to ip: " +
+                                    lastResponseIP.trim().replace("/", "")
+                                        .replace(":" + Settings.BROADCAST_PORT, ""));
                             clientSocket = new Socket(lastResponseIP.trim().replace("/", "")
                                         .replace(":" + Settings.BROADCAST_PORT, "")
                                     , Settings.TCP_PORT);
                             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                             out.write(data);
+                            out.close();
+                            clientSocket.close();
                         } catch (UnknownHostException ex) {
-                            Logger.getLogger(JavaApplication2.class.getName()).log(Level.SEVERE, null, ex);
+                            //Logger.getLogger(JavaApplication2.class.getName()).log(Level.SEVERE, null, ex);
+                            System.out.println("LOOP - ADMIN: IP/Host Unknown");
                         } catch (IOException ex) {
-                            Logger.getLogger(JavaApplication2.class.getName()).log(Level.SEVERE, null, ex);
+                            //Logger.getLogger(JavaApplication2.class.getName()).log(Level.SEVERE, null, ex);
+                            System.out.println("LOOP - ADMIN: I/O Exception... "
+                                    + ex.getMessage());
                         }
                         
                         

@@ -15,11 +15,11 @@ public class Settings {
     public static int TCP_PORT = 4447;
     
     static String NETWORK_ATTACH_REQ = "NATTREQ";
-    static int BROADCAST_RECEIVE_TIMEOUT = 300; // in miliseconds
+    static int BROADCAST_RECEIVE_TIMEOUT = 1000; // in miliseconds
     static String NETWORK_ATTACH_CONFIRM = "NATTCONF";
     static int BROADCAST_FAST_RECEIVE_TIMEOUT = 500;
     static String NETWORK_ATTACH_MONITOR = "NATTMONIT";
-    static int TCP_RECEIVE_TIMEOUT = 300;
+    static int TCP_RECEIVE_TIMEOUT = 1000;
     
     
     
