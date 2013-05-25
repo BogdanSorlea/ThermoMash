@@ -56,7 +56,8 @@ public class ThermoMash {
         System.out.println("Attempting NETWORK CONNECT...");
         
         while (NETWORK_ATTACH_ATTEMPTS < MAX_NETWORK_ATTACH_ATTEMPTS) {
-            System.out.print("\tAttempt " + NETWORK_ATTACH_ATTEMPTS + ": ");
+            System.out.print("\tAttempt " + NETWORK_ATTACH_ATTEMPTS
+                    + " (" + getIP() + "): ");
 //            try {
 //                new MulticastServerThread("NETWORK ATTACH REQUEST").start();
 //                new MulticastClientThread().start();
@@ -66,18 +67,15 @@ public class ThermoMash {
             
             transmitBroadcast(Settings.NETWORK_ATTACH_REQ);
             String response = null;
-            //response = receiveBroadcast(Settings.BROADCAST_RECEIVE_TIMEOUT);
-
-            HandleServerTCP connection = new HandleServerTCP();  
-                adminIP = connection.getIPAddress();
-                connection.openSocket(adminIP,Settings.ADMIN_PORT);
-                response = connection.readCommand();
+            response = receiveBroadcast(Settings.BROADCAST_RECEIVE_TIMEOUT);
             
             // If there is already an admin and a monitor in the system.
             if ( response != null 
-                    && response.equals(Settings.NETWORK_ATTACH_CONF) ) {
+                    && response.contains(Settings.NETWORK_ATTACH_CONF)
+                    && response.contains(getIP()) ) {
                 IS_ADMIN = false;
-                IS_WORKER = true;                
+                IS_WORKER = true;
+                adminIP = tmp[2];
                 System.out.print("RESP. FROM " + lastResponseIP);
                 break;
             } 
@@ -93,9 +91,11 @@ public class ThermoMash {
             }
             
             IS_ADMIN = true;
+            IS_WORKER = false;
             noOfNodes = 1;
             NETWORK_ATTACH_ATTEMPTS++;
-            System.out.println("NO RESPONSE. UPGRADING TO ADMIN.");
+            if ( NETWORK_ATTACH_ATTEMPTS == MAX_NETWORK_ATTACH_ATTEMPTS - 1)
+                System.out.println("NO RESPONSE. UPGRADING TO ADMIN.");
         }
         
         while (true) {
@@ -223,7 +223,7 @@ public class ThermoMash {
                 data = new String(packet.getData());
                 data = data.trim();
                
-                lastResponseIP =  packet.getSocketAddress().toString();//socket.getRemoteSocketAddress().toString();
+                lastResponseIP = packet.getSocketAddress().toString();//socket.getRemoteSocketAddress().toString();
                 System.out.println("broadcast from: " + lastResponseIP);
             } catch (SocketTimeoutException e) {
                 data = null;
@@ -240,4 +240,14 @@ public class ThermoMash {
         
         return data;
     }
+    
+    private static String getIP(){
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException ex) {
+        }
+        return null;
+    }
 }
+
+

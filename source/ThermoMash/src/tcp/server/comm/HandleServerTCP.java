@@ -89,7 +89,7 @@ public String getIPAddress()
    {
     this.ois = new ObjectInputStream(clientSocket.getInputStream());
     this.oos = new ObjectOutputStream(clientSocket.getOutputStream());
-    while (this.readCommand() != null) {}
+    //while (this.readCommand() != null) {}
    } 
    catch (IOException e) 
    {
@@ -98,7 +98,7 @@ public String getIPAddress()
  }
 
  // Receive and process incoming command from client socket 
-
+/*
  public String readCommand() 
  {
      String s = null;
@@ -119,7 +119,7 @@ public String getIPAddress()
     // String currentDateTime = theDateService.getDateAndTime();
     // this.send(currentDateTime);
  }
-
+*/
 
  // Send a message back through to the client socket as an Object
  private void send(Object o) 

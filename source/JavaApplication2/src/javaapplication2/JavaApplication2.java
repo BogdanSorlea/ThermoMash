@@ -68,7 +68,7 @@ public class JavaApplication2 {
                 is.close();
                 clientSocket.close();
             } catch (IOException ex) {
-                Logger.getLogger(JavaApplication2.class.getName()).log(Level.SEVERE, null, ex);
+                //Logger.getLogger(JavaApplication2.class.getName()).log(Level.SEVERE, null, ex);
             }
             
             if ( response != null
@@ -85,7 +85,7 @@ public class JavaApplication2 {
                 IS_ADMIN = false;
                 IS_MONITOR = true;
                 adminIP = lastResponseIP.trim().replace("/", "")
-                        .replace(":" + Settings.BROADCAST_PORT, "");;
+                        .replace(":" + Settings.BROADCAST_PORT, "");
                 break;
             }
         }
@@ -133,7 +133,9 @@ public class JavaApplication2 {
                         
                         clientSocket = null;
                         try {
-                            clientSocket = new Socket(lastResponseIP, Settings.TCP_PORT);
+                            clientSocket = new Socket(lastResponseIP.trim().replace("/", "")
+                                        .replace(":" + Settings.BROADCAST_PORT, "")
+                                    , Settings.TCP_PORT);
                             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                             out.write(data);
                         } catch (UnknownHostException ex) {
