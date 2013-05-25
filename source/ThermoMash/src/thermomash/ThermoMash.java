@@ -62,7 +62,7 @@ public class ThermoMash {
                     && response.contains(getIP()) ) {
                 IS_ADMIN = false;
                 IS_WORKER = true;
-                adminIP = response.split(Settings.FIELD_DELIMITER)[1];
+                adminIP = lastResponseIP;
                 System.out.print("RESP. FROM " + adminIP);
                 break;
             } 
@@ -73,7 +73,7 @@ public class ThermoMash {
                 IS_ADMIN = false;
                 IS_WORKER = true;
                 IS_MONITOR = true;
-                adminIP = response.split(Settings.FIELD_DELIMITER)[1];
+                adminIP = lastResponseIP;
                 System.out.print("RESP. FROM " +  adminIP);
                 break;
             }
@@ -124,7 +124,7 @@ public class ThermoMash {
                         monitorOkSent = false;
                     }
                     if ( request.contains(Settings.DATAPREFIX) ) {
-                        System.out.println(request);
+                        System.out.println("HERE... " + request);
                         data.put(lastResponseIP, 
                                 Integer.parseInt(
                                     request.split(Settings.FIELD_DELIMITER)[2]
@@ -192,13 +192,13 @@ public class ThermoMash {
             
             if ( IS_WORKER ){
                 System.out.print("WORK: ");
-                String data = adminIP
+                String dat = adminIP
                                 + Settings.FIELD_DELIMITER
                                 + getIP() + Settings.FIELD_DELIMITER
                                 + Settings.DATAPREFIX + Long.toString(
                             Math.round(17 + Math.random() * 10));
-                System.out.println(data);
-                transmitBroadcast(data);
+                System.out.println(dat);
+                transmitBroadcast(dat);
             }
             
             
