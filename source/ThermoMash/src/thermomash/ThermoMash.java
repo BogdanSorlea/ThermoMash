@@ -15,12 +15,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import java.net.*;
-import java.io.*;
-import java.net.ServerSocket;
-import java.net.InetSocketAddress;
-import tcp.server.comm.HandleServerTCP;		// The communication handler
-import tcp.client.comm.HandleClientTCP;		// The communication handler
 
 /**
  *
@@ -33,7 +27,7 @@ public class ThermoMash {
      
     private static boolean IS_ADMIN = false;
     private static boolean IS_MONITOR = false;
-    private static boolean IS_WORKER = true;
+    private static boolean IS_WORKER = false;
     
     private static String lastResponseIP = null;
     private static String adminIP = null;
@@ -47,7 +41,6 @@ public class ThermoMash {
     private static int adminOkIterations = 0;
     private static int monitorOkIterations = 0;
    
-    private static boolean jj = false;
     /**
      * @param args the command line arguments
      */
@@ -56,14 +49,8 @@ public class ThermoMash {
         System.out.println("Attempting NETWORK CONNECT...");
         
         while (NETWORK_ATTACH_ATTEMPTS < MAX_NETWORK_ATTACH_ATTEMPTS) {
-            System.out.print("\tAttempt " + NETWORK_ATTACH_ATTEMPTS
-                    + " (" + getIP() + "): ");
-//            try {
-//                new MulticastServerThread("NETWORK ATTACH REQUEST").start();
-//                new MulticastClientThread().start();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
+            System.out.print("\tA" + NETWORK_ATTACH_ATTEMPTS);
+                    //+ " (" + getIP() + "): ");
             
             transmitBroadcast(Settings.NETWORK_ATTACH_REQ);
             String response = null;
@@ -75,18 +62,19 @@ public class ThermoMash {
                     && response.contains(getIP()) ) {
                 IS_ADMIN = false;
                 IS_WORKER = true;
-                adminIP = tmp[2];
-                System.out.print("RESP. FROM " + lastResponseIP);
+                adminIP = response.split(Settings.FIELD_DELIMITER)[1];
+                System.out.print("RESP. FROM " + adminIP);
                 break;
             } 
             // If there is already an admin in the system.
             else if ( response != null 
-                    && response.equals(Settings.NETWORK_ATTACH_MONITOR) ) {
+                    && response.equals(Settings.NETWORK_ATTACH_MONITOR)
+                    && response.contains(getIP()) ) {
                 IS_ADMIN = false;
                 IS_WORKER = true;
                 IS_MONITOR = true;
-                  //Client address
-                System.out.print("RESP. FROM " +  lastResponseIP);
+                adminIP = response.split(Settings.FIELD_DELIMITER)[1];
+                System.out.print("RESP. FROM " +  adminIP);
                 break;
             }
             
@@ -99,7 +87,7 @@ public class ThermoMash {
         }
         
         while (true) {
-            /*
+
             // readphase
             String request = null;
             request = receiveBroadcast(Settings.BROADCAST_FAST_RECEIVE_TIMEOUT);
@@ -107,83 +95,116 @@ public class ThermoMash {
             
             // writephase
             if ( IS_ADMIN ){
-                System.out.println("I am an Admin");
-                System.out.println("the number of connected nodes: " + noOfNodes);
-                
-                if (jj == false){
-                // Create the Handle Connection object
-                HandleServerTCP connection = new HandleServerTCP();  
-                adminIP = connection.getIPAddress();
-                connection.openSocket(adminIP,Settings.ADMIN_PORT);	
-                System.out.println("Admins IP is: " + adminIP);
-                jj = true;
-                
-                
-                }
+                System.out.println("ADM. Conn. nodes: " + noOfNodes);
                 
                 if ( request != null ){
                 if ( request.equals(Settings.NETWORK_ATTACH_REQ) ){
-
+                    System.out.println("NATTREQ");
                     if ( noOfNodes == 1 ) {
-                        transmitBroadcast(Settings.NETWORK_ATTACH_MONITOR);
+                        transmitBroadcast(lastResponseIP
+                                + Settings.FIELD_DELIMITER
+                                + getIP() + Settings.FIELD_DELIMITER
+                                + Settings.NETWORK_ATTACH_MONITOR);
+                        monitorIP = lastResponseIP;
                     } else {
-                        transmitBroadcast(Settings.NETWORK_ATTACH_CONF);
+                        transmitBroadcast(lastResponseIP
+                                + Settings.FIELD_DELIMITER
+                                + getIP() + Settings.FIELD_DELIMITER
+                                + Settings.NETWORK_ATTACH_CONF);
                     }
                     noOfNodes++;
-                } else if ( request.equals(Settings.ADMIN_RUNNING) ) {
-                    transmitBroadcast(Settings.ADMINOK);
-                    adminOkIterations = 0;
-                    adminOkSent = false;
-                } else {
-                    if ( request.contains(Settings.DATAPREFIX) ) {
-                        data.put(lastResponseIP, 
-                                Integer.parseInt(
-                                    request.replace(Settings.DATAPREFIX, "")
-                                        .trim()));
+                    } else if ( request.equals(Settings.ADMIN_RUNNING) ) {
+                        transmitBroadcast(lastResponseIP
+                                    + Settings.FIELD_DELIMITER
+                                    + getIP() + Settings.FIELD_DELIMITER
+                                    + Settings.ADMINOK);
+                    } else {
+
+                        if ( request.contains(Settings.MONITOROK) ) {
+                            monitorOkIterations = 0;
+                            monitorOkSent = false;
+                        }
+                        if ( request.contains(Settings.DATAPREFIX) ) {
+                            data.put(lastResponseIP, 
+                                    Integer.parseInt(
+                                        request.split(Settings.FIELD_DELIMITER)[2]
+                                            .replace(Settings.DATAPREFIX, "")
+                                            .trim()));
+                        }
+
+                        if ( monitorOkIterations == Settings.MONITOR_RESPONSE_ITERATIONS ) {
+                            System.out.println("!!! NEED TO SPAWN A NEW MONITOR !!!");
+                            monitorOkSent = false;
+                        }
+
+                        if ( !monitorOkSent ){
+                            transmitBroadcast(monitorIP
+                                    + Settings.FIELD_DELIMITER
+                                    + getIP() + Settings.FIELD_DELIMITER
+                                    + Settings.MONITOR_RUNNING);
+                            monitorOkSent = true;
+                            monitorOkIterations = 0;
+                        }    
                     }
-                    if ( !monitorOkSent ){
-                        transmitBroadcast(Settings.MONITOR_RUNNING);
-                        monitorOkSent = true;
-                        monitorOkIterations = 0;
-                    }// else if ( monitorOkSent && monitorOkIterations > 20 ){
-                        // upgrade a regular instance to monitor
-                    //}      
-                }}
+                
+                }
             }
             
             if ( IS_MONITOR ){
-                System.out.println("I AM MONITOR.");
+                System.out.println("MONIT.");
                 if ( request != null )
-                if ( request.equals(Settings.NETWORK_ATTACH_REQ) ){
-                    transmitBroadcast(Settings.NOTIFY_MONITOR);
-                } else if ( request.equals(Settings.MONITOR_RUNNING) ) {
-                    transmitBroadcast(Settings.MONITOROK);
-                    monitorOkIterations = 0;
-                    monitorOkSent = false;
-                }
+                if ( request.contains(Settings.MONITOR_RUNNING) ) {
+                    transmitBroadcast(adminIP
+                                + Settings.FIELD_DELIMITER
+                                + getIP() + Settings.FIELD_DELIMITER
+                                + Settings.MONITOROK);
+                } else {
+                    if ( request.contains(Settings.ADMINOK) ) {
+                        adminOkIterations = 0;
+                        adminOkSent = false;
+                    }
+                    if ( request.contains(Settings.DATAPREFIX) ) {
+                        data.put(lastResponseIP, 
+                                Integer.parseInt(
+                                    request.split(Settings.FIELD_DELIMITER)[2]
+                                        .replace(Settings.DATAPREFIX, "")
+                                        .trim()));
+                    }
                 
-                if ( !adminOkSent ){
-                    transmitBroadcast(Settings.ADMIN_RUNNING);
-                    adminOkSent = true;
-                    adminOkIterations = 0;
+                    if ( adminOkIterations == Settings.ADMIN_RESPONSE_ITERATIONS ) {
+                        System.out.println("!!! NEED TO SPAWN A NEW ADMIN !!!");
+                        adminOkSent = false;
+                    }
+                
+                    if ( !adminOkSent ){
+                        transmitBroadcast(adminIP
+                                + Settings.FIELD_DELIMITER
+                                + getIP() + Settings.FIELD_DELIMITER
+                                + Settings.ADMIN_RUNNING);
+                        adminOkSent = true;
+                        adminOkIterations = 0;
+                    }
+                    
                 }
             }
+            
+            
             
             if ( IS_WORKER ){
-            System.out.println("I am a Worker");
-            
-            //if (adminIP!= null){            
-             //   HandleClientTCP client = new HandleClientTCP();
-                // Connect to the server
-              //  client.connectToServer(adminIP,Settings.ADMIN_PORT);}
-            
-                //transmitBroadcast(Settings.DATAPREFIX + Long.toString(
-                //            Math.round(17 + Math.random() * 10)));
+                System.out.println("WORK.");
+                transmitBroadcast(adminIP
+                                + Settings.FIELD_DELIMITER
+                                + getIP() + Settings.FIELD_DELIMITER
+                                + Settings.DATAPREFIX + Long.toString(
+                            Math.round(17 + Math.random() * 10)));
             }
             
-            adminOkIterations++;
-            monitorOkIterations++;
-            */ 
+            
+            
+            if (IS_MONITOR)
+                adminOkIterations++;
+            if (IS_ADMIN)
+                monitorOkIterations++;
         }
         
         

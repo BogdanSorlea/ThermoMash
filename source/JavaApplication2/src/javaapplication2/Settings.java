@@ -22,6 +22,10 @@ public class Settings {
     static int TCP_RECEIVE_TIMEOUT = 1000;
     static String DATAPREFIX = "DATA:";
     static int TCP_FAST_RECEIVE_TIMEOUT = 100;
+    static String LAST_RESPONSE_IP = null;
+    static String LAST_BROADCAST_MESSAGE = null;
+    static String MESSAGE_TO_BROADCAST = null;
+    
     
     
     
