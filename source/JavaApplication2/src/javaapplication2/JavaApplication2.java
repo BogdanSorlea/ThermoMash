@@ -149,7 +149,7 @@ public class JavaApplication2 {
                             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                             out.write(data);
                             out.close();
-                            clientSocket.close();
+                            //clientSocket.close();
                         } catch (UnknownHostException ex) {
                             //Logger.getLogger(JavaApplication2.class.getName()).log(Level.SEVERE, null, ex);
                             System.out.println("LOOP - ADMIN: IP/Host Unknown");
