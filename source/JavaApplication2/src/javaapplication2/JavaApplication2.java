@@ -82,9 +82,10 @@ public class JavaApplication2 {
                     && response.contains(Settings.NETWORK_ATTACH_CONFIRM) ) {
                 System.out.println("ATTACHLOOP: Simple attach confirmed.");
                 IS_WORKER = true;
-                IS_ADMIN = false;
-                adminIP = lastResponseIP.trim().replace("/", "")
-                        .replace(":" + Settings.BROADCAST_PORT, "");
+                IS_ADMIN = false;     
+                lastResponseIP = lastResponseIP.trim().replace("/", "");
+                lastResponseIP = lastResponseIP.substring(0, lastResponseIP.indexOf(":"));
+                adminIP = lastResponseIP;
                 break;
             }
             if ( response != null
@@ -93,8 +94,9 @@ public class JavaApplication2 {
                 IS_WORKER = true;
                 IS_ADMIN = false;
                 IS_MONITOR = true;
-                adminIP = lastResponseIP.trim().replace("/", "")
-                        .replace(":" + Settings.BROADCAST_PORT, "");
+                lastResponseIP = lastResponseIP.trim().replace("/", "");
+                lastResponseIP = lastResponseIP.substring(0, lastResponseIP.indexOf(":"));
+                adminIP = lastResponseIP;
                 break;
             }
         }
@@ -146,6 +148,7 @@ public class JavaApplication2 {
                 System.out.println("LOOP: Could not read TCP connection. Socket timeout?");
             } catch (IOException ex) {
                 System.out.println("LOOP: Could not read TCP connection. IO Exception");
+                System.out.println(ex.getStackTrace());
             }
             
             
@@ -162,12 +165,11 @@ public class JavaApplication2 {
                         
                         clientSocket = null;
                         try {
+                            lastResponseIP = lastResponseIP.trim().replace("/", "");
+                            lastResponseIP = lastResponseIP.substring(0, lastResponseIP.indexOf(":"));
                             System.out.println("LOOP - ADMIN: Trying to send NETWATT confirm. to ip: " +
-                                    lastResponseIP.trim().replace("/", "")
-                                        .replace(":" + Settings.BROADCAST_PORT, ""));
-                            clientSocket = new Socket(lastResponseIP.trim().replace("/", "")
-                                        .replace(":" + Settings.BROADCAST_PORT, "")
-                                    , Settings.TCP_PORT);
+                                    lastResponseIP);
+                            clientSocket = new Socket(lastResponseIP, Settings.TCP_PORT);
                             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                             out.write(data);
                             out.close();
@@ -217,7 +219,7 @@ public class JavaApplication2 {
                 
                 clientSocket = null;
                 try {
-                    System.out.println("LOOP - WORKER: Sending data");
+                    System.out.println("LOOP - WORKER: Sending data to " + adminIP);
                     clientSocket = new Socket(adminIP, Settings.TCP_PORT);
                     BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                     out.write(Long.toString(Math.round(Math.random() * 10) + 20));
@@ -225,10 +227,10 @@ public class JavaApplication2 {
                     //clientSocket.close();
                 } catch (UnknownHostException ex) {
                     //Logger.getLogger(JavaApplication2.class.getName()).log(Level.SEVERE, null, ex);
-                    System.out.println("LOOP - ADMIN: IP/Host Unknown");
+                    System.out.println("LOOP - WORKER: IP/Host Unknown");
                 } catch (IOException ex) {
                     //Logger.getLogger(JavaApplication2.class.getName()).log(Level.SEVERE, null, ex);
-                    System.out.println("LOOP - ADMIN: I/O Exception... "
+                    System.out.println("LOOP - WORKER: I/O Exception... "
                             + ex.getMessage());
                 }
                 
