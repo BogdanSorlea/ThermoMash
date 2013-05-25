@@ -17,10 +17,11 @@ public class Settings {
     static String NETWORK_ATTACH_REQ = "NATTREQ";
     static int BROADCAST_RECEIVE_TIMEOUT = 1000; // in miliseconds
     static String NETWORK_ATTACH_CONFIRM = "NATTCONF";
-    static int BROADCAST_FAST_RECEIVE_TIMEOUT = 500;
+    static int BROADCAST_FAST_RECEIVE_TIMEOUT = 100;
     static String NETWORK_ATTACH_MONITOR = "NATTMONIT";
     static int TCP_RECEIVE_TIMEOUT = 1000;
     static String DATAPREFIX = "DATA:";
+    static int TCP_FAST_RECEIVE_TIMEOUT = 100;
     
     
     

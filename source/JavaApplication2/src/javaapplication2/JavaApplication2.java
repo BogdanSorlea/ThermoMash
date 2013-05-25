@@ -129,17 +129,12 @@ public class JavaApplication2 {
         
         while(true){
             
-            new Thread() {
-                public void run() {
-                    JavaApplication2.broadcastIn = receiveBroadcast(Settings.BROADCAST_FAST_RECEIVE_TIMEOUT);
-                }
-            }.start();
             String request = null;
-            request = broadcastIn;
+            request = receiveBroadcast(Settings.BROADCAST_FAST_RECEIVE_TIMEOUT);
                     
             String response = null;
             try {
-                server.setSoTimeout(Settings.TCP_RECEIVE_TIMEOUT);
+                server.setSoTimeout(Settings.TCP_FAST_RECEIVE_TIMEOUT);
                 clientSocket = server.accept();
                 BufferedReader is = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 //PrintStream os = new PrintStream(clientSocket.getOutputStream());
