@@ -30,6 +30,6 @@ public class Settings {
     
     public static int RESPONSE_DELAY_ITERATIONS = 100;
     public static String FIELD_DELIMITER = "|";
-    public static int MONITOR_RESPONSE_ITERATIONS = 50;
-    public static int ADMIN_RESPONSE_ITERATIONS = 50;
+    public static int MONITOR_RESPONSE_ITERATIONS = 20;
+    public static int ADMIN_RESPONSE_ITERATIONS = 20;
 }
