@@ -148,7 +148,7 @@ public class JavaApplication2 {
                 System.out.println("LOOP: Could not read TCP connection. Socket timeout?");
             } catch (IOException ex) {
                 System.out.println("LOOP: Could not read TCP connection. IO Exception");
-                System.out.println(ex.getStackTrace());
+                ex.printStackTrace();
             }
             
             
