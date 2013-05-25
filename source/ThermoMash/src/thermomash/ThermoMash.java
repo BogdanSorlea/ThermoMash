@@ -124,6 +124,7 @@ public class ThermoMash {
                         monitorOkSent = false;
                     }
                     if ( request.contains(Settings.DATAPREFIX) ) {
+                        System.out.println(request);
                         data.put(lastResponseIP, 
                                 Integer.parseInt(
                                     request.split(Settings.FIELD_DELIMITER)[2]
@@ -190,12 +191,14 @@ public class ThermoMash {
             
             
             if ( IS_WORKER ){
-                System.out.println("WORK.");
-                transmitBroadcast(adminIP
+                System.out.print("WORK: ");
+                String data = adminIP
                                 + Settings.FIELD_DELIMITER
                                 + getIP() + Settings.FIELD_DELIMITER
                                 + Settings.DATAPREFIX + Long.toString(
-                            Math.round(17 + Math.random() * 10)));
+                            Math.round(17 + Math.random() * 10));
+                System.out.println(data);
+                transmitBroadcast(data);
             }
             
             
