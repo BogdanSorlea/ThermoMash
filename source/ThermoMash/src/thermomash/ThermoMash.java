@@ -82,7 +82,7 @@ public class ThermoMash {
             IS_WORKER = false;
             noOfNodes = 1;
             NETWORK_ATTACH_ATTEMPTS++;
-            if ( NETWORK_ATTACH_ATTEMPTS == MAX_NETWORK_ATTACH_ATTEMPTS - 1)
+            if ( NETWORK_ATTACH_ATTEMPTS == MAX_NETWORK_ATTACH_ATTEMPTS )
                 System.out.println("NO RESPONSE. UPGRADING TO ADMIN.");
         }
         
@@ -91,7 +91,6 @@ public class ThermoMash {
             // readphase
             String request = null;
             request = receiveBroadcast(Settings.BROADCAST_FAST_RECEIVE_TIMEOUT);
-            System.out.println(request);
             
             // writephase
             if ( IS_ADMIN ){
@@ -113,39 +112,39 @@ public class ThermoMash {
                                 + Settings.NETWORK_ATTACH_CONF);
                     }
                     noOfNodes++;
-                    } else if ( request.equals(Settings.ADMIN_RUNNING) ) {
+                } else if ( request.equals(Settings.ADMIN_RUNNING) ) {
                         transmitBroadcast(lastResponseIP
-                                    + Settings.FIELD_DELIMITER
+                                    + Settings.FIELD_DELIMITER 
                                     + getIP() + Settings.FIELD_DELIMITER
                                     + Settings.ADMINOK);
-                    } else {
+                } else {
 
-                        if ( request.contains(Settings.MONITOROK) ) {
-                            monitorOkIterations = 0;
-                            monitorOkSent = false;
-                        }
-                        if ( request.contains(Settings.DATAPREFIX) ) {
-                            data.put(lastResponseIP, 
-                                    Integer.parseInt(
-                                        request.split(Settings.FIELD_DELIMITER)[2]
-                                            .replace(Settings.DATAPREFIX, "")
-                                            .trim()));
-                        }
-
-                        if ( monitorOkIterations == Settings.MONITOR_RESPONSE_ITERATIONS ) {
-                            System.out.println("!!! NEED TO SPAWN A NEW MONITOR !!!");
-                            monitorOkSent = false;
-                        }
-
-                        if ( !monitorOkSent ){
-                            transmitBroadcast(monitorIP
-                                    + Settings.FIELD_DELIMITER
-                                    + getIP() + Settings.FIELD_DELIMITER
-                                    + Settings.MONITOR_RUNNING);
-                            monitorOkSent = true;
-                            monitorOkIterations = 0;
-                        }    
+                    if ( request.contains(Settings.MONITOROK) ) {
+                        monitorOkIterations = 0;
+                        monitorOkSent = false;
                     }
+                    if ( request.contains(Settings.DATAPREFIX) ) {
+                        data.put(lastResponseIP, 
+                                Integer.parseInt(
+                                    request.split(Settings.FIELD_DELIMITER)[2]
+                                        .replace(Settings.DATAPREFIX, "")
+                                        .trim()));
+                    }
+
+                    if ( monitorOkIterations == Settings.MONITOR_RESPONSE_ITERATIONS ) {
+                        System.out.println("!!! NEED TO SPAWN A NEW MONITOR !!!");
+                        monitorOkSent = false;
+                    }
+
+                    if ( !monitorOkSent ){
+                        transmitBroadcast(monitorIP
+                                + Settings.FIELD_DELIMITER
+                                + getIP() + Settings.FIELD_DELIMITER
+                                + Settings.MONITOR_RUNNING);
+                        monitorOkSent = true;
+                        monitorOkIterations = 0;
+                    }    
+                }
                 
                 }
             }
@@ -244,7 +243,9 @@ public class ThermoMash {
                 data = new String(packet.getData());
                 data = data.trim();
                
-                lastResponseIP = packet.getSocketAddress().toString();//socket.getRemoteSocketAddress().toString();
+                lastResponseIP = packet.getSocketAddress().toString().trim();//socket.getRemoteSocketAddress().toString();
+                lastResponseIP = lastResponseIP.replace("/", "");
+                lastResponseIP = lastResponseIP.substring(0, lastResponseIP.indexOf(":"));
                 System.out.println("broadcast from: " + lastResponseIP);
             } catch (SocketTimeoutException e) {
                 data = null;
