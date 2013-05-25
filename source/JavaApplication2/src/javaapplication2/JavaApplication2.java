@@ -49,7 +49,8 @@ public class JavaApplication2 {
         try {
             server = new ServerSocket(Settings.TCP_PORT);
         } catch (IOException ex) {
-            Logger.getLogger(JavaApplication2.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(JavaApplication2.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("INIT: cannot create serversocket");
         }
         
         for (int i=0; i<5; i++){
@@ -69,10 +70,12 @@ public class JavaApplication2 {
                 clientSocket.close();
             } catch (IOException ex) {
                 //Logger.getLogger(JavaApplication2.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("ATTACHLOOP: IOException - probably socket timeout");
             }
             
             if ( response != null
                     && response.contains(Settings.NETWORK_ATTACH_CONFIRM) ) {
+                System.out.println("ATTACHLOOP: Simple attach confirmed.");
                 IS_WORKER = true;
                 IS_ADMIN = false;
                 adminIP = lastResponseIP.trim().replace("/", "")
@@ -81,6 +84,7 @@ public class JavaApplication2 {
             }
             if ( response != null
                     && response.contains(Settings.NETWORK_ATTACH_MONITOR) ) {
+                System.out.println("ATTACHLOOP: Monitor attach confirmed.");
                 IS_WORKER = true;
                 IS_ADMIN = false;
                 IS_MONITOR = true;
