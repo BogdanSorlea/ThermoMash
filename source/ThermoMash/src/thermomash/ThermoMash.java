@@ -34,6 +34,7 @@ public class ThermoMash {
     private static String monitorIP = null;
     
     private static Map<String, Integer> data = new HashMap<>();
+    private static Map<String, Integer> ids = new HashMap<>();
     private static int noOfNodes = 0;
     
     private static boolean adminOkSent = false;
@@ -81,8 +82,12 @@ public class ThermoMash {
             IS_ADMIN = true;
             IS_WORKER = false;
             NETWORK_ATTACH_ATTEMPTS++;
-            if ( NETWORK_ATTACH_ATTEMPTS == MAX_NETWORK_ATTACH_ATTEMPTS )
+            if ( NETWORK_ATTACH_ATTEMPTS == MAX_NETWORK_ATTACH_ATTEMPTS ) {
                 System.out.println("NO RESPONSE. UPGRADING TO ADMIN.");
+                noOfNodes++;
+                ids.put(getIP(), noOfNodes);
+            }
+                
         }
         
         while (true) {
@@ -93,24 +98,28 @@ public class ThermoMash {
             
             // writephase
             if ( IS_ADMIN ){
-                System.out.println("ADM. Conn. nodes: " + noOfNodes / 2);
+                System.out.println("ADM. Conn. nodes: " + ids.size());
                 
                 if ( request != null ){
                 if ( request.equals(Settings.NETWORK_ATTACH_REQ) ){
                     System.out.println("NATTREQ");
+                    if ( ids.get(lastResponseIP) == null ) {
+                        noOfNodes++;
+                        ids.put(lastResponseIP, noOfNodes);
+                    }
                     if ( noOfNodes == 2 ) {
                         transmitBroadcast(lastResponseIP
                                 + Settings.FIELD_DELIMITER
                                 + getIP() + Settings.FIELD_DELIMITER
                                 + Settings.NETWORK_ATTACH_MONITOR);
                         monitorIP = lastResponseIP;
-                    } else if ( noOfNodes > 2) {
+                    } else {
                         transmitBroadcast(lastResponseIP
                                 + Settings.FIELD_DELIMITER
                                 + getIP() + Settings.FIELD_DELIMITER
                                 + Settings.NETWORK_ATTACH_CONF);
                     }
-                    noOfNodes++;
+                    
                 } else if ( request.equals(Settings.ADMIN_RUNNING) ) {
                         transmitBroadcast(lastResponseIP
                                     + Settings.FIELD_DELIMITER 

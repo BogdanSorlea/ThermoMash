@@ -25,7 +25,7 @@ public class Settings {
     public static String MONITOROK = "MONITOROK";
     public static String DATAPREFIX = "DATA:";
     
-    public static int BROADCAST_RECEIVE_TIMEOUT = 5000; // in miliseconds
+    public static int BROADCAST_RECEIVE_TIMEOUT = 1000; // in miliseconds
     public static int BROADCAST_FAST_RECEIVE_TIMEOUT = 500; // in miliseconds
     
     public static int RESPONSE_DELAY_ITERATIONS = 100;
