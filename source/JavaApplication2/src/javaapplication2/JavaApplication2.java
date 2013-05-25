@@ -38,6 +38,7 @@ public class JavaApplication2 {
     private static int noOfNodes = 0;
     private static String lastResponseIP = null;
     private static String adminIP = null;
+    private static String broadcastIn = null;
     
     /**
      * @param args the command line arguments
@@ -128,9 +129,14 @@ public class JavaApplication2 {
         
         while(true){
             
+            new Thread() {
+                public void run() {
+                    JavaApplication2.broadcastIn = receiveBroadcast(Settings.BROADCAST_FAST_RECEIVE_TIMEOUT);
+                }
+            }.start();
             String request = null;
-            request = receiveBroadcast(Settings.BROADCAST_FAST_RECEIVE_TIMEOUT);
-            
+            request = broadcastIn;
+                    
             String response = null;
             try {
                 server.setSoTimeout(Settings.TCP_RECEIVE_TIMEOUT);
