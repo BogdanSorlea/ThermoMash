@@ -41,6 +41,7 @@ public class ThermoMash {
     private static boolean monitorOkSent = false;
     private static int adminOkIterations = 0;
     private static int monitorOkIterations = 0;
+    private static int workerLoopCount = 0;
    
     /**
      * @param args the command line arguments
@@ -223,14 +224,20 @@ public class ThermoMash {
             
             
             if ( IS_WORKER ){
-                System.out.print("WORK: ");
-                String dat = adminIP
-                                + Settings.FIELD_DELIMITER
-                                + getIP() + Settings.FIELD_DELIMITER
-                                + Settings.DATAPREFIX + Long.toString(
-                            Math.round(20 + Math.random() * 10));
-                System.out.println(dat);
-                transmitBroadcast(dat);
+                if (workerLoopCount == 100){
+                    System.out.print("WORK: ");
+                    String dat = adminIP
+                                    + Settings.FIELD_DELIMITER
+                                    + getIP() + Settings.FIELD_DELIMITER
+                                    + Settings.DATAPREFIX + Long.toString(
+                                Math.round(20 + Math.random() * 10));
+                    System.out.println(dat);
+                    transmitBroadcast(dat);
+                    
+                    workerLoopCount = 0;
+                } else {
+                    workerLoopCount++;
+                }
             }
             
             
