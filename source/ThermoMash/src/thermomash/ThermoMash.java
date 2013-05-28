@@ -224,7 +224,7 @@ public class ThermoMash {
             
             
             if ( IS_WORKER ){
-                if (workerLoopCount == 100){
+                if (workerLoopCount == 25){
                     System.out.print("WORK: ");
                     String dat = adminIP
                                     + Settings.FIELD_DELIMITER
