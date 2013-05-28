@@ -42,6 +42,9 @@ public class ThermoMash {
     private static int adminOkIterations = 0;
     private static int monitorOkIterations = 0;
     private static int workerLoopCount = 0;
+    private static int iteration = 0;
+    
+    private static int[] values = new int[255];
    
     /**
      * @param args the command line arguments
@@ -93,6 +96,12 @@ public class ThermoMash {
         
         while (true) {
 
+            if ( iteration == noOfNodes - 2){
+                iteration = 0;
+            } else {
+                iteration++;
+            }
+            
             // readphase
             String request = null;
             request = receiveBroadcast(Settings.BROADCAST_FAST_RECEIVE_TIMEOUT);
@@ -140,14 +149,21 @@ public class ThermoMash {
                 } else if ( request.equals(Settings.QUERYDATA) ) {
                         long sum = 0;
                         int count = 0;
+                        
                         for (String key : data.keySet()) {
                             sum += data.get(key);
                             count++;
-                            System.out.println(" -- " + key + " :: " + data.get(key));
+                            //System.out.println(" -- " + key + " :: " + data.get(key));
                         }
-                        if ( count > 0 )
+                        
+                        for (int i=0; i<noOfNodes-1; i++) {
+                            sum += values[i];
+                        }
+                        sum += (int) Math.round(20 + Math.random() * 10);
+                        
+                        if ( noOfNodes > 0 )
                             transmitBroadcast(Settings.DATARESPONSE + 
-                                    (int) sum / count);
+                                    (int) sum / noOfNodes);
                         else
                             transmitBroadcast(Settings.DATARESPONSE +
                                     "NOT AVAILABLE");
@@ -159,6 +175,12 @@ public class ThermoMash {
                     }
                     if ( request.contains(Settings.DATAPREFIX) ) {
                         System.out.println("HERE... " + request);
+                        
+                        values[iteration] = Integer.parseInt(
+                                    request.split(Settings.FIELD_DELIMITER)[2]
+                                        .replace(Settings.DATAPREFIX, "")
+                                        .trim());
+                        
                         data.put(lastResponseIP, 
                                 Integer.parseInt(
                                     request.split(Settings.FIELD_DELIMITER)[2]
@@ -225,7 +247,7 @@ public class ThermoMash {
             
             
             if ( IS_WORKER ){
-                if (workerLoopCount == 25){
+                if (workerLoopCount == 15){
                     System.out.print("WORK: ");
                     String dat = adminIP
                                     + Settings.FIELD_DELIMITER
