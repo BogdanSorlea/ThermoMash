@@ -143,6 +143,7 @@ public class ThermoMash {
                         for (String key : data.keySet()) {
                             sum += data.get(key);
                             count++;
+                            System.out.println(" -- " + key + " :: " + data.get(key));
                         }
                         if ( count > 0 )
                             transmitBroadcast(Settings.DATARESPONSE + 
